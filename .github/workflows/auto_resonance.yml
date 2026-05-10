@@ -22,6 +22,17 @@ jobs:
       - name: Run Resonant Stability Field
         run: echo "Running Resonant Stability Field"
 
+      - name: Prepare Provenance Subject
+        run: |
+          mkdir -p output
+          cat > output/por-copilot-bridge-provenance.json <<'JSON'
+          {
+            "repo": "SemeAIPletinnya/por-copilot-bridge",
+            "package": "por-copilot-bridge",
+            "purpose": "Deterministic provenance subject for the lightweight release-governance bridge workflow."
+          }
+          JSON
+
       - name: Upload Resonance Artifacts
         uses: actions/upload-artifact@v4
         with:

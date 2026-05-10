@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from fnmatch import fnmatch
+import shlex
 
 from .evidence import has_passing_test_evidence, has_rollback_evidence, has_verification_claim
 from .models import Proposal, RiskLevel
@@ -52,6 +53,25 @@ def _matches_any(path: str, patterns: tuple[str, ...]) -> bool:
     return any(fnmatch(path, pattern) or fnmatch(path.split("/")[-1], pattern) for pattern in patterns)
 
 
+def _is_main_ref(token: str) -> bool:
+    return token in {"main", "refs/heads/main"} or token.endswith(":main") or token.endswith(":refs/heads/main")
+
+
+def _is_force_push_to_main(command: str) -> bool:
+    try:
+        tokens = shlex.split(command)
+    except ValueError:
+        tokens = command.split()
+
+    if len(tokens) < 4 or tokens[:2] != ["git", "push"]:
+        return False
+
+    push_args = tokens[2:]
+    has_force = any(arg in {"--force", "-f", "--force-with-lease"} or arg.startswith("--force-with-lease=") for arg in push_args)
+    targets_main = any(_is_main_ref(arg) for arg in push_args)
+    return has_force and targets_main
+
+
 def is_docs_only(files_changed: tuple[str, ...]) -> bool:
     return bool(files_changed) and all(_matches_any(path, _MARKDOWN_PATTERNS) for path in files_changed)
 
@@ -74,7 +94,7 @@ def evaluate_risk(proposal: Proposal) -> tuple[RuleFinding, ...]:
 
     for command in proposal.commands:
         lowered = command.lower()
-        if any(pattern in lowered for pattern in _DESTRUCTIVE_COMMANDS):
+        if any(pattern in lowered for pattern in _DESTRUCTIVE_COMMANDS) or _is_force_push_to_main(lowered):
             findings.append(RuleFinding(RiskLevel.CRITICAL, "destructive shell command", silence=True))
 
     for phrase in _SILENCE_PHRASES:

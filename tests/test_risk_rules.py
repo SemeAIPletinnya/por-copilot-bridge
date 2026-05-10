@@ -96,3 +96,28 @@ def test_database_migration_with_rollback_still_needs_review():
     assert result.decision is Decision.NEEDS_REVIEW
     assert result.risk_level is RiskLevel.HIGH
     assert "database migrations" in result.reasons
+
+
+def test_force_with_lease_pushes_to_main_are_silenced():
+    commands = [
+        "git push --force-with-lease origin main",
+        "git push --force-with-lease=main origin main",
+        "git push --force-with-lease origin refs/heads/main",
+        "git push --force-with-lease=refs/heads/main origin main",
+    ]
+
+    for command in commands:
+        result = evaluate_proposal(
+            {
+                "source": "agent",
+                "title": "Force update main",
+                "files_changed": ["src/app.py"],
+                "commands": [command],
+                "claims": [],
+                "evidence": [],
+            }
+        )
+
+        assert result.decision is Decision.SILENCE
+        assert result.risk_level is RiskLevel.CRITICAL
+        assert "destructive shell command" in result.reasons
