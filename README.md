@@ -24,6 +24,14 @@ This is not a GitHub App, SaaS dashboard, IDE plugin, SDK, LLM judge, LangChain 
 
 It is release-governance middleware: a deterministic gate that assigns release state to a candidate produced elsewhere.
 
+## Relationship to Silence-as-Control
+
+`silence-as-control` is the core primitive and evidence repository for the Silence-as-Control / Proof-of-Resonance framing. `por-copilot-bridge` is an applied coding-agent release-governance bridge compatible by state and schema in v0.1.1, without a direct package dependency.
+
+AI coding-agent output is a candidate, not a release. Generation is not release, and merge must be earned through bounded review, evidence, and release governance. The bridge's `NEEDS_REVIEW` state is an operational escalation state, not a replacement for the core binary primitive.
+
+See [docs/silence_as_control_integration.md](docs/silence_as_control_integration.md) for the bounded integration notes.
+
 ## Design position
 
 Generation is not release.

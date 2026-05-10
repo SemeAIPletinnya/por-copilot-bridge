@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "por-copilot-bridge"
-version = "0.1.0"
+version = "0.1.1"
 description = "Deterministic release-governance bridge for AI coding-agent outputs."
 readme = "README.md"
 requires-python = ">=3.10"
