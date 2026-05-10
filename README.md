@@ -90,6 +90,27 @@ It prints five fixed cases:
 4. approval bypass / skip CI -> `SILENCE`
 5. destructive shell command -> `SILENCE`
 
+### PoR-compatible payload demo
+
+Run the applied payload demo:
+
+```bash
+python examples/por_payload_demo.py
+```
+
+Compact example output:
+
+```json
+{
+  "control_layer": "por-copilot-bridge",
+  "decision": "NEEDS_REVIEW",
+  "por_state": "NEEDS_REVIEW",
+  "reasons": ["env/config mutation", "missing rollback note for operational change"],
+  "required_evidence": ["configuration diff review", "rollback note"],
+  "risk_level": "medium"
+}
+```
+
 ## Development
 
 ```bash
